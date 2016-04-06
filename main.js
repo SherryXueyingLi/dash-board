@@ -7,7 +7,8 @@ require.config({
 require(['dashBoard'], function(DashBoard){
 	var border = document.getElementById("dashboard");
 	var dashboard = new DashBoard({
-		element: border
+		element: border,
+		minHeight: 50
 	});
 	dashboard.addBoard({
 		title:'Assign to Me',
@@ -16,7 +17,7 @@ require(['dashBoard'], function(DashBoard){
 		title:'Activiey Stream',
 		minHeight: 300,
 	}).addBoard({
-		title:'Activiey Stream',
+		title:'Introduction',
 		minHeight: 80,
 		column: 1
 	});

@@ -1,36 +1,26 @@
 body {
 	font-family: Calibri, "Helvetica Neue", Helvetica, Arial, sans-serif;
 	padding: 15px;
+	overflow-x:hidden;
 }
 .boardboard{
 	display: inline-block;
 	width: 100%;
 	margin: 0px;
-
-}
-.boardboard>div{
-	margin-left:15px;
-	margin-right:15px;
-}
-.boardboard>div{
+	border-radius: 3px;
 	border: solid 1px #CAC3C3;
+}
+.boardboard>div{
+}
+.boardboard>div{
 	border-collapse: collapse;
 }
-.boardboard:first-child{
-	border-top-left-radius: 3px;
-	border-top-right-radius: 3px;
-}
-.boardboard:last-child{
-	border-bottom-left-radius: 3px;
-	border-bottom-right-radius: 3px;
-}
 .boardboard>.bord-title{
-	padding: 5px 0px 5px 10px;
+	padding: 3px 10px 3px 10px;
 }
-.board-drapover:before{
-	content:"Drop Here";
-	height:100px;
+.ondragover:before{
+	content: 'Drop';
+	width: 100%;
+	height: 100px;
 	border: solid 3px gray;
-	margin: 5px;
-	/* width: 45%; */
 }

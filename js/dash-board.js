@@ -1,6 +1,25 @@
 define(function(){
 	"use restrict";
 	
+	
+	var createDropZone = function(){
+		var dropzone = document.createElement("li");
+		dropzone.style.height="50px";
+		dropzone.style.zIndex="-1";
+		dropzone.style.padding = "10px";
+		var div = document.createElement("div");
+		div.style.height="100%";
+		div.style.border="dashed 3px gray";
+		div.align ="center";
+		var span = document.createElement("h2");
+		span.textContent="Drop Here";
+		span.style.color="gray";
+		div.appendChild(span);
+		dropzone.appendChild(div);
+		return dropzone;
+	};
+	
+	var dropzone = createDropZone();
 	var CopyOptions = function(defaultOption, option){
 		var op = {};
 		for(var key in defaultOption){
@@ -10,18 +29,127 @@ define(function(){
 		return op;
 	};
 	
+	var findPageOffset =function (element){
+		var top = element.offsetTop, left = element.offsetLeft, start = element;
+		var current = element.parentElement;
+		while (current !== null){
+			left += current.offsetLeft;
+			top += current.offsetTop;
+			current = current.offsetParent;
+		}
+		return {top: top, left: left};
+	};
+	
+	var start = false, li, dragObj = null, X, Y, original;
+	var dragstartHander = function(event){
+		start=true;
+		dragObj = this;
+		li = dragObj.element.parentElement;
+		original = findPageOffset(li);
+		li.parentElement.insertBefore(dropzone, li);
+		li.style.position="fixed";
+		li.style.zIndex ="-1";
+		li.style.left = original.left+"px";
+		li.style.top =  original.top+"px";
+		dropzone.style.height = li.scrollHeight+"px";
+//		original = {
+//			left: +li.style.left.split("px")[0],
+//			top: +li.style.top.split("px")[0]
+//		}
+		X = event.pageX, Y = event.pageY;
+		
+	};
+	
+	var dragHandler = function(event){
+		if(start && dragObj){
+			var xPage = event.pageX, yPage = event.pageY;//--
+			var moveX = xPage - X + original.left;
+			var moveY = yPage - Y +  original.top;
+			li.style.left = moveX+"px";
+			li.style.top =  moveY+"px";
+		}
+	};
+	
+	var dragendHandler = function(event){
+		start=false, li = null;
+		if(dragObj){
+			var liElement = dragObj.element.parentElement;
+			liElement.style.position="relative";
+			liElement.style.left="0px";
+			liElement.style.top="0px";
+			if(dropzone.parentElement){
+				dropzone.parentElement.insertBefore(dragObj.element.parentElement, dropzone);
+				dropzone.parentElement.removeChild(dropzone);
+			}
+			liElement.style.zIndex = null;
+			dragObj = null;
+		}
+		
+	};
+	
+	
+	var mouseOverLi = function(event){
+		if(start && dragObj){
+			if(dropzone.parentElement && dropzone.parentElement!== this.parentElement){
+				dropzone.parentElement.removeChild(dropzone);
+			} 
+			this.parentElement.insertBefore(dropzone, this);
+		}
+	};
+	document.onmousemove = dragHandler;
+	document.onmouseup = dragendHandler;
+	
 	var createTitle = function(){
 		var title = document.createElement("div");
 		title.classList.add("bord-title");
 		title.style.backgroundColor = this.option.color || "#469CD6";
 		title.style.height ="20px";
+		
 		var span = document.createElement("span");
 		span.textContent=this.option.title;
 		span.style.color="white";
 		span.style.fontWeight="bold";
+		span.style.cursor="move";
 		title.appendChild(span);
+		
+		var icon = createIcon();
+		icon.style.width="15px";
+		icon.style.display = "inline-block";
+		icon.style.float = "right";
+		icon.align="center";
+		title.appendChild(icon);
+		span.onmousedown = dragstartHander.bind(this);
 		return title;
 	};
+	
+	var createIcon = function(){
+		var icon = document.createElement("div");
+		for(var i=0; i<3; i++){
+			icon.appendChild(createRow());
+		}
+		icon.align="center";
+		icon.style.cursor="pointer";
+		icon.onmouseover = function(){
+			for(var i=0; i<icon.childElementCount; i++){
+				icon.children[i].style.borderColor="#EFC433";
+			}
+		};
+		icon.onmouseout =function(){
+			for(var i=0; i<icon.childElementCount; i++){
+				icon.children[i].style.borderColor="white";
+			}
+		}
+		return icon;
+	}
+	
+	var createRow = function(){
+		var a = document.createElement("div");
+		a.style.border="solid";
+		a.style.borderWidth="1px";
+		a.style.borderColor="white";
+		a.style.margin="2px";
+		return a;
+	}
 	
 	var createContent = function(){
 		var content = document.createElement("div");
@@ -48,26 +176,6 @@ define(function(){
 		column: 0
 	};
 	
-	var dragHandler = function(event){
-		console.log(event);
-	};
-	var dropHandler = function(event){
-	};
-	
-	var ondragenterHander = function(event){
-		event.preventDefault();
-		this.option.element.classList.add("board-drapover");
-	};
-	var ondragendHander = function(event){
-		event.preventDefault();
-		this.option.element.classList.remove("board-drapover");
-	}
-	
-	var ondragleaveHander = function(event){
-		event.preventDefault();
-		this.option.element.classList.remove("board-drapover")
-	};
-	
 	var Board = function(options){
 		var option = CopyOptions(boardDefalt, options);
 		option.column === 'left' && (option.column = 0);
@@ -85,25 +193,19 @@ define(function(){
 			var div = document.createElement("div");
 			div.classList.add("boardboard");
 			div.style.minHeight = this.option.minHeight+"px";
-			
-			div.appendChild(createTitle.apply(this));
+			div.style.width = "100%";
+			var title = createTitle.apply(this);
+			div.appendChild(title);
 			div.appendChild(createContent.apply(this));
 			return div;
 		};
-		
 		this.option.element = init.apply(this);
-		this.option.element.ondrag = dragHandler.bind(this);
-		this.option.element.draggable="true"
-		this.option.element.ondrop = dropHandler.bind(this);
-		this.option.element.ondragenter = ondragenterHander.bind(this);
-		this.option.element.ondragleave = ondragleaveHander.bind(this);
 	};
 	
 	var defaultOptions = {
 		element: document.body,
 		column: 2
 	};
-	
 	var createUl = function(){
 		var ul = document.createElement("ul");
 		ul.style.position = "relative";
@@ -113,6 +215,10 @@ define(function(){
 		ul.style.width = (100/this.option.column)+"%";
 		ul.style.display = "inline-block";
 		this.option.element.appendChild(ul);
+		
+		var li = standardLi();
+		li.style.height="20px";
+		ul.appendChild(li);
 		return ul;
 	}
 	var DashBoard = function(options){
@@ -124,6 +230,7 @@ define(function(){
 		}
 		if(option.column <0 || option.column>2) option.column=2;
 		option.element.style.position="relative";
+		option.element.style.zIndex="999";
 		option.element.classList.add("dashBoard");
 		
 		Object.defineProperties(this, {
@@ -144,18 +251,29 @@ define(function(){
 		}
 	};
 	
-	var createLi = function(board){
+	var standardLi = function(){
 		var li = document.createElement("li");
+		li.style.position = "relative";
+		li.onmouseover=mouseOverLi.bind(li);
+		li.classList.add("boardboardLi");
 		li.style.padding = "10px";
+		return li;
+	}
+	
+	var createLi = function(board){
+		var li = standardLi();
+		
 		var ul = board.column === 0? this.left : this.right;
-		ul.appendChild(li);
+		ul.insertBefore(li, ul.lastChild);
 		var offset = findOffset.call(this, li);
 		li.appendChild(board.element);
-		/*board.element.style.position="absolute";
-		board.element.style.left = offset.left+"px";
-		board.element.style.top = offset.top+"px";
-		this.option.element.appendChild(board.element);*/
-	}
+		li.style.height = board.element.scrollHeight+"px";
+		li.style.width = board.element.scrollWidth+"px";
+		
+		return li;
+	};
+	
+	
 	DashBoard.prototype={
 		addBoard : function(options){
 			var board = new Board(options);
