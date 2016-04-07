@@ -13,6 +13,7 @@ define(function(){
 		div.align ="center";
 		var span = document.createElement("h2");
 		span.textContent="Drop Here";
+		span.onselectstart = function() { return false; };
 		span.style.color="gray";
 		div.appendChild(span);
 		dropzone.appendChild(div);
@@ -48,7 +49,11 @@ define(function(){
 		original = findPageOffset(li);
 		li.parentElement.insertBefore(dropzone, li);
 		li.style.position="fixed";
-		li.style.zIndex ="-1";
+		var lis = document.getElementsByClassName("boardboardLi");
+		for(var i=0; i<lis.length; i++){
+			lis[i].style.zIndex ="20";
+		}
+		li.style.zIndex ="0";
 		li.style.left = original.left+"px";
 		li.style.top =  original.top+"px";
 		dropzone.style.height = li.scrollHeight+"px";
@@ -76,6 +81,7 @@ define(function(){
 			var liElement = dragObj.element.parentElement;
 			liElement.style.position="relative";
 			liElement.style.left="0px";
+			liElement.style.zIndex="20";
 			liElement.style.top="0px";
 			if(dropzone.parentElement){
 				dropzone.parentElement.insertBefore(dragObj.element.parentElement, dropzone);
@@ -111,7 +117,6 @@ define(function(){
 		span.style.fontWeight="bold";
 		span.style.cursor="move";
 		title.appendChild(span);
-		
 		var icon = createIcon();
 		icon.style.width="15px";
 		icon.style.display = "inline-block";
@@ -151,8 +156,14 @@ define(function(){
 		return a;
 	}
 	
-	var createContent = function(){
+	var createContent = function(option){
 		var content = document.createElement("div");
+		content.classList.add("boardContent");
+		if(option.contentUrl){
+			content.innerHTML ="<iframe frameborder=0 border=0 src='"+option.contentUrl+"'></iframe>"; 
+		}else if(option.content){
+			content.innerHTML=option.content;
+		}
 		content.style.minHeight = (this.option.minHeight-20)+"px";
 		return content;
 	}
@@ -173,20 +184,21 @@ define(function(){
 		element: document.createElement("div"),
 		title: '',
 		minHeight: 100,
-		column: 0
+		column: undefined,
+		contentUrl:undefined,
+		content: undefined
 	};
 	
 	var Board = function(options){
 		var option = CopyOptions(boardDefalt, options);
-		option.column === 'left' && (option.column = 0);
-		option.column === 'right' && (option.column = 1);
 		Object.defineProperties(this, {
 			'option':{
 				get: function(){return option;}
 			},'element':{
 				get: function(){return this.option.element;}
 			}, 'column':{
-				value: option.column
+				get: function(){return option.column;},
+				set: function(val){!isNaN(val) && (option.column = val);}
 			}
 		});
 		var init = function(){
@@ -196,7 +208,7 @@ define(function(){
 			div.style.width = "100%";
 			var title = createTitle.apply(this);
 			div.appendChild(title);
-			div.appendChild(createContent.apply(this));
+			div.appendChild(createContent.call(this, this.option));
 			return div;
 		};
 		this.option.element = init.apply(this);
@@ -206,29 +218,30 @@ define(function(){
 		element: document.body,
 		column: 2
 	};
-	var createUl = function(){
+	var createUl = function(parent, totalColumn, i){
 		var ul = document.createElement("ul");
-		ul.style.position = "relative";
+		ul.style.position = "absolute";
 		ul.style.margin = "0px";
 		ul.style.listStyle="none";
 		ul.style.padding="0px";
-		ul.style.width = (100/this.option.column)+"%";
-		ul.style.display = "inline-block";
-		this.option.element.appendChild(ul);
 		
+		ul.style.display = "inline-block";
+		parent.appendChild(ul);
+		ul.style.width = parent.scrollWidth/totalColumn +"px";
+		ul.style.left = parent.scrollWidth/totalColumn * i +"px";
 		var li = standardLi();
 		li.style.height="20px";
 		ul.appendChild(li);
 		return ul;
 	}
 	var DashBoard = function(options){
-		var dashBoard = this, left, right;
+		var dashBoard = this, columns=[];
 		var boards = [];
 		var option = CopyOptions(defaultOptions, options);
 		if(typeof option.element === 'string'){
 			option.element = document.getElementById(option.element) || document.body;
 		}
-		if(option.column <0 || option.column>2) option.column=2;
+		if(option.column <0) option.column=2;
 		option.element.style.position="relative";
 		option.element.style.zIndex="999";
 		option.element.classList.add("dashBoard");
@@ -238,16 +251,15 @@ define(function(){
 				get: function(){return boards;}
 			},'option':{
 				get: function(){return option;}
-			},'left':{
-				get: function(){return left;}
+			},'columns':{
+				get: function(){return columns;}
 			},'right':{
 				get: function(){return right;}
 			}
 		});
-		left = createUl.apply(this);
-		if(option.column===2){
-			right = createUl.apply(this);
-			right.style.position="absolute";
+		
+		for(var i=0; i<option.column; i++){
+			columns.push(createUl.call(this, this.option.element, this.option.column, i));
 		}
 	};
 	
@@ -258,12 +270,25 @@ define(function(){
 		li.classList.add("boardboardLi");
 		li.style.padding = "10px";
 		return li;
+	};
+	
+	var findShortestUl = function(columns){
+		if(!columns) throw new Error("UL Columns not found!", "dash-board.js");
+		var index=0;
+		for(var i=1; i<columns.length; i++){
+			if(columns[i].scrollHeight < columns[index].scrollHeight){
+				index=i;
+			}
+		}
+		return index;
 	}
 	
-	var createLi = function(board){
-		var li = standardLi();
-		
-		var ul = board.column === 0? this.left : this.right;
+	var createLi = function(board, columns){
+		var li = standardLi(), ul;
+		if(isNaN(board.column)){
+			board.column = findShortestUl(columns);
+		}
+		ul = columns[board.column];
 		ul.insertBefore(li, ul.lastChild);
 		var offset = findOffset.call(this, li);
 		li.appendChild(board.element);
@@ -278,7 +303,7 @@ define(function(){
 		addBoard : function(options){
 			var board = new Board(options);
 			var column = board.column;
-			createLi.call(this, board);
+			createLi.call(this, board, this.columns);
 			this.boards.push(board);
 			board.parent = this;
 			return this;
