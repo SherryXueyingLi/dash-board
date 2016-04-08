@@ -1,10 +1,12 @@
 require.config({
 	paths: {
-		'dashBoard': 'js/dash-board'
+		'dashBoard': 'js/dash-board',
+		'knockout': 'src/lib/knockout-3.3.0',
+		'vm': 'src/content/knockoutvm'
 	}
 })
 
-require(['dashBoard'], function(DashBoard){
+require(['dashBoard', "knockout"], function(DashBoard, ko){
 	var border = document.getElementById("dashboard");
 	var dashboard = new DashBoard({
 		element: "dashboard",
@@ -35,7 +37,13 @@ require(['dashBoard'], function(DashBoard){
 	}).addBoard({
 		title:'knockout Binding',
 		minHeight: 180,
-		column: 3
+		column: 3,
+		contentUrl: 'src/content/knockout.html',
+		onLoad: function(){
+			require(["knockout", "vm"],function(ko, vm){
+				ko.applyBindings(vm, document.getElementById('knockout'))
+			});
+		}
 	}).addBoard({
 		title:'Anduglar Controller Injection',
 		minHeight: 180,
