@@ -1,0 +1,16 @@
+.blueSky .boardTitle{
+	
+}
+
+.blueSky .boardboard{
+	width: 100%;
+	margin: 0px;
+	border-radius: 3px;
+	border: solid 1px #CAC3C3;
+	box-shadow: 1px 1px 3px #E2DFDF;
+}
+
+.blueSky .boardTitle{
+	background-color: #58B3F1;
+	color: white
+}
