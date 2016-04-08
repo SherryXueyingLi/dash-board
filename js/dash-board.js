@@ -65,7 +65,7 @@ define(function(){
 			top += current.offsetTop;
 			current = current.offsetParent;
 		}
-		return {top: top, left: left};
+		return {top: top-window.scrollY, left: left-window.scrollX};
 	};
 	
 	var start = false, li, dragObj = null, X, Y, original;
@@ -90,6 +90,7 @@ define(function(){
 	
 	var dragHandler = function(event){
 		if(start && dragObj){
+			event.preventDefault();
 			var xPage = event.pageX, yPage = event.pageY;//--
 			var moveX = xPage - X + original.left;
 			var moveY = yPage - Y +  original.top;
@@ -225,7 +226,8 @@ define(function(){
 		contentUrl:undefined,
 		content: undefined,
 		removeble: true,
-		theme: undefined
+		theme: undefined,
+		onLoad: function(){}
 	};
 	
 	var Board = function(options){
@@ -253,10 +255,10 @@ define(function(){
 		this.option.element = init.apply(this);
 	};
 	
-	var defaultOptions = {
+	var boardDefaultOptions = {
 		element: document.body,
 		column: 2,
-		onNewBoard: function(){},
+		onLoad: function(){},
 		theme: 'defaultTheme'
 	};
 	var createUl = function(parent, totalColumn, i){
@@ -290,7 +292,7 @@ define(function(){
 	var DashBoard = function(options){
 		var dashBoard = this, columns=[];
 		var boards = [];
-		var option = CopyOptions(defaultOptions, options);
+		var option = CopyOptions(boardDefaultOptions, options);
 		if(typeof option.element === 'string'){
 			option.element = document.getElementById(option.element) || document.body;
 		}
@@ -314,7 +316,7 @@ define(function(){
 		for(var i=0; i<option.column; i++){
 			columns.push(createUl.call(this, this.option.element, this.option.column, i));
 		}
-		option.onNewBoard.call(this);
+		//option.onNewBoard.call(this);
 		var i = findLongestUl(columns);
 		option.element.style.height = columns[i].scrollHeight + "px";
 		option.element.style.width =  option.element.scrollWidth + "px";
@@ -367,6 +369,7 @@ define(function(){
 			this.option.element.style.height =  this.columns[i].scrollHeight + "px";
 			
 			board.parent = this;
+			board.option.onLoad.call(this);
 			return this;
 		},
 		getBoard : function(index){

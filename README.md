@@ -12,7 +12,7 @@ Use with requireJs:
 		paths: {
 			'dashBoard': 'js/dash-board'
 		}
-	})
+	});
 	require(['dashBoard'], function(DashBoard){
 		var dashboard = new DashBoard({
 				element: border, 
@@ -22,10 +22,10 @@ Use with requireJs:
 			
 **Options**
 
->Following || Option Name || Default Value || Description||
+>Following  Option Name >> Default Value >> Description 
 
-* element| document.body | The element Object or id of the element Object. |
-* column| 2 | How many columns in the page. | 
+* element >> document.body >> The element Object or id of the element Object. 
+* column >> 2 >> How many columns in the page. 
 
 
 ## Add Dash Board
@@ -42,14 +42,14 @@ Use with requireJs:
 			minHeight: 120,
 			column: 2,
 			contentUrl: 'src/content/addboard.html'
-		})
+		});
 		
 **Options**
 
->Following || Option Name || Default Value || Description||
+>Following  Option Name >> Default Value >> Description 
 
-* | title | empty string | The dash board title|
-* | minHeight| 50 | The min-height of the board. |
-* | column| auto find the column with shortest height | Which column do you want to put this board in. | 
-* |content| | The content of the board, this option will be ignored if 'contentUrl' is set. |	
-* |content| | The relative path of the content file|	  			
+* title >> empty string >> The dash board title.
+* minHeight >> 50 >> The min-height of the board. 
+* column >> auto find the column with shortest height >> Which column do you want to put this board in. 
+* content >> undefined >> The content of the board, this option will be ignored if 'contentUrl' is set. 	
+* contentUrl >> undefined >> The relative path of the content file.	  			
