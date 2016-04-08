@@ -7,18 +7,18 @@ require.config({
 require(['dashBoard'], function(DashBoard){
 	var border = document.getElementById("dashboard");
 	var dashboard = new DashBoard({
-		element: border,
-		minHeight: 50,
+		element: "dashboard",
 		column: 3,
+		theme: 'blueSky'
 	});
 	dashboard.addBoard({
 		title:'Init the board',
-		minHeight: 100,
-		content: '<pre>To Init the board:</pre><code>var dashboard = new DashBoard({options});</code>'
+		minHeight: 120,
+		content: '<div style="padding: 5px;"><p>To Init the board:</p><code>var dashboard = new DashBoard({options});</code></div>'
 	}).addBoard({
 		title:'Init Board Options',
-		minHeight: 300,
 		column: 1,
+		contentUrl: 'src/content/initoption.html'
 	}).addBoard({
 		title:'Add Single Board',
 		minHeight: 120,
@@ -26,7 +26,7 @@ require(['dashBoard'], function(DashBoard){
 		contentUrl: 'src/content/addboard.html'
 	}).addBoard({
 		title:'AddBoard Options',
-		minHeight: 280,
+		contentUrl: 'src/content/addboardOption.html',
 		column: 2
 	}).addBoard({
 		title:'Board APIs',

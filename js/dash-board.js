@@ -130,30 +130,30 @@ define(function(){
 	
 	var createTitle = function(){
 		var title = document.createElement("div");
-		title.classList.add("bord-title");
-		title.style.backgroundColor = this.option.color || "#469CD6";
+		title.classList.add("boardTitle");
+		title.style.backgroundColor = this.option.color;// || "#469CD6";
 		title.style.height ="20px";
-		
+		title.style.padding = "3px 10px 3px 10px";
 		var span = document.createElement("span");
 		span.textContent=this.option.title;
-		span.style.color="white";
+		//span.style.color="white";
 		span.style.fontWeight="bold";
 		span.style.cursor="move";
 		title.appendChild(span);
-		var icon = createIcon();
+		/*var icon = createIcon();
 		icon.style.width="15px";
 		icon.style.display = "inline-block";
 		icon.style.float = "right";
 		icon.align="center";
-		title.appendChild(icon);
+		title.appendChild(icon);*/
 		span.onmousedown = dragstartHander.bind(this);
 		return title;
 	};
 	
-	var createIcon = function(){
+	var createIcon = function(color){
 		var icon = document.createElement("div");
 		for(var i=0; i<3; i++){
-			icon.appendChild(createRow());
+			icon.appendChild(createRow("#469CD6"));
 		}
 		icon.align="center";
 		icon.style.cursor="pointer";
@@ -164,17 +164,17 @@ define(function(){
 		};
 		icon.onmouseout =function(){
 			for(var i=0; i<icon.childElementCount; i++){
-				icon.children[i].style.borderColor="white";
+				icon.children[i].style.borderColor="#469CD6";
 			}
 		}
 		return icon;
 	}
 	
-	var createRow = function(){
+	var createRow = function(color){
 		var a = document.createElement("div");
 		a.style.border="solid";
 		a.style.borderWidth="1px";
-		a.style.borderColor="white";
+		a.style.borderColor=color;
 		a.style.margin="2px";
 		return a;
 	}
@@ -182,6 +182,7 @@ define(function(){
 	var createContent = function(option){
 		var content = document.createElement("div");
 		content.classList.add("boardContent");
+		//content.style.padding = "3px 10px 3px 10px";
 		var board = this;
 		if(option.contentUrl){
 			var request = new XMLHttpRequest();
@@ -219,11 +220,12 @@ define(function(){
 	var boardDefalt ={
 		element: document.createElement("div"),
 		title: '',
-		minHeight: 100,
+		minHeight: 50,
 		column: undefined,
 		contentUrl:undefined,
 		content: undefined,
-		removeble: true
+		removeble: true,
+		theme: undefined
 	};
 	
 	var Board = function(options){
@@ -254,7 +256,8 @@ define(function(){
 	var defaultOptions = {
 		element: document.body,
 		column: 2,
-		onNewBoard: function(){}
+		onNewBoard: function(){},
+		theme: 'defaultTheme'
 	};
 	var createUl = function(parent, totalColumn, i){
 		var ul = document.createElement("ul");
@@ -271,7 +274,19 @@ define(function(){
 		li.style.height="20px";
 		ul.appendChild(li);
 		return ul;
+	};
+	
+	var findLongestUl = function(columns){
+		if(!columns) throw new Error("UL Columns not found!", "dash-board.js");
+		var index=0;
+		for(var i=1; i<columns.length; i++){
+			if(columns[i].scrollHeight > columns[index].scrollHeight){
+				index=i;
+			}
+		}
+		return index;
 	}
+	
 	var DashBoard = function(options){
 		var dashBoard = this, columns=[];
 		var boards = [];
@@ -300,6 +315,9 @@ define(function(){
 			columns.push(createUl.call(this, this.option.element, this.option.column, i));
 		}
 		option.onNewBoard.call(this);
+		var i = findLongestUl(columns);
+		option.element.style.height = columns[i].scrollHeight + "px";
+		option.element.style.width =  option.element.scrollWidth + "px";
 	};
 	
 	var standardLi = function(){
@@ -335,10 +353,9 @@ define(function(){
 		li.appendChild(board.element);
 		li.style.height = board.element.scrollHeight+"px";
 		li.style.width = board.element.scrollWidth+"px";
-		
+		li.classList.add(board.option.theme || this.option.theme);
 		return li;
 	};
-	
 	
 	DashBoard.prototype={
 		addBoard : function(options){
@@ -346,6 +363,9 @@ define(function(){
 			var column = board.column;
 			createLi.call(this, board, this.columns);
 			this.boards.push(board);
+			var i = findLongestUl(this.columns);
+			this.option.element.style.height =  this.columns[i].scrollHeight + "px";
+			
 			board.parent = this;
 			return this;
 		},
