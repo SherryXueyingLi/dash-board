@@ -1,7 +1,6 @@
 define(function(){
 	"use restrict";
 	
-	
 	var createDropZone = function(){
 		var dropzone = document.createElement("li");
 		dropzone.style.height="50px";
@@ -18,6 +17,34 @@ define(function(){
 		div.appendChild(span);
 		dropzone.appendChild(div);
 		return dropzone;
+	};
+	var contextMenu;
+	var createContextOption = function(text, onclick){
+		var li = document.createElement("li");
+		var span = document.createElement("span");
+		li.appendChild(span);
+		span.textContent=text;
+		li.onclick= function(event){
+			contextMenu.parentElement.remove(contextMenu);
+			onclick.call(li, event);
+		};
+		return li;
+	}
+	
+	var createContextMenu = function(board){
+		var menu = document.createElement("ul");
+		menu.style.board="solid 1px gray";
+		menu.appendChild(createContextOption("Close", onBoardClose));
+		menu.appendChild(createContextOption("Remove", onBoardRemove));
+		return menu;
+	};
+	
+	var onBoardRemove = function(){
+		
+	};
+	
+	var onBoardClose = function(){
+		
 	};
 	
 	var dropzone = createDropZone();
@@ -57,10 +84,6 @@ define(function(){
 		li.style.left = original.left+"px";
 		li.style.top =  original.top+"px";
 		dropzone.style.height = li.scrollHeight+"px";
-//		original = {
-//			left: +li.style.left.split("px")[0],
-//			top: +li.style.top.split("px")[0]
-//		}
 		X = event.pageX, Y = event.pageY;
 		
 	};
@@ -159,8 +182,21 @@ define(function(){
 	var createContent = function(option){
 		var content = document.createElement("div");
 		content.classList.add("boardContent");
+		var board = this;
 		if(option.contentUrl){
-			content.innerHTML ="<iframe frameborder=0 border=0 src='"+option.contentUrl+"'></iframe>"; 
+			var request = new XMLHttpRequest();
+			request.open("GET", location.href.split("index.html")[0]+option.contentUrl);
+			request.send(null);
+			request.onreadystatechange = function(){
+				if (request.readyState === XMLHttpRequest.DONE) {
+					if (request.status === 200) {
+						content.innerHTML = request.responseText;
+						board.element.parentElement.style.height = board.element.scrollHeight+"px";
+					} else {
+						throw new Error("Load HTML Error", "dash-board.js");
+					}
+				}
+			};
 		}else if(option.content){
 			content.innerHTML=option.content;
 		}
@@ -186,7 +222,8 @@ define(function(){
 		minHeight: 100,
 		column: undefined,
 		contentUrl:undefined,
-		content: undefined
+		content: undefined,
+		removeble: true
 	};
 	
 	var Board = function(options){
@@ -216,7 +253,8 @@ define(function(){
 	
 	var defaultOptions = {
 		element: document.body,
-		column: 2
+		column: 2,
+		onNewBoard: function(){}
 	};
 	var createUl = function(parent, totalColumn, i){
 		var ul = document.createElement("ul");
@@ -261,6 +299,7 @@ define(function(){
 		for(var i=0; i<option.column; i++){
 			columns.push(createUl.call(this, this.option.element, this.option.column, i));
 		}
+		option.onNewBoard.call(this);
 	};
 	
 	var standardLi = function(){
@@ -287,6 +326,8 @@ define(function(){
 		var li = standardLi(), ul;
 		if(isNaN(board.column)){
 			board.column = findShortestUl(columns);
+		}else{
+			board.column>=1 && board.column--;
 		}
 		ul = columns[board.column];
 		ul.insertBefore(li, ul.lastChild);

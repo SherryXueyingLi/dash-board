@@ -12,21 +12,33 @@ require(['dashBoard'], function(DashBoard){
 		column: 3,
 	});
 	dashboard.addBoard({
-		title:'Assign to Me',
+		title:'Init the board',
 		minHeight: 100,
-		content: '<h3>Hello World</h3>'
+		content: '<pre>To Init the board:</pre><code>var dashboard = new DashBoard({options});</code>'
 	}).addBoard({
-		title:'Activiey Stream',
+		title:'Init Board Options',
 		minHeight: 300,
-		
-	}).addBoard({
-		title:'Introduction',
-		minHeight: 80,
 		column: 1,
-		contentUrl: 'src/content/introduce.html'
 	}).addBoard({
-		title:'Favourate Filters',
-		minHeight: 80,
+		title:'Add Single Board',
+		minHeight: 120,
+		column: 2,
+		contentUrl: 'src/content/addboard.html'
+	}).addBoard({
+		title:'AddBoard Options',
+		minHeight: 280,
 		column: 2
+	}).addBoard({
+		title:'Board APIs',
+		minHeight: 180,
+		column: 2
+	}).addBoard({
+		title:'knockout Binding',
+		minHeight: 180,
+		column: 3
+	}).addBoard({
+		title:'Anduglar Controller Injection',
+		minHeight: 180,
+		column: 3
 	});
 })
