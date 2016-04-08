@@ -1,6 +1,10 @@
 define(function(){
 	"use restrict";
 	
+	var MutationObserver = window.MutationObserver
+	|| window.WebKitMutationObserver
+	|| window.MozMutationObserver;
+	
 	var createDropZone = function(){
 		var dropzone = document.createElement("li");
 		dropzone.style.height="50px";
@@ -340,6 +344,10 @@ define(function(){
 			}
 		}
 		return index;
+	};
+	
+	var panelChangeReactor = function(mutation, board){
+		board.element.parentElement.style.height = board.element.scrollHeight+"px";
 	}
 	
 	var createLi = function(board, columns){
@@ -356,6 +364,16 @@ define(function(){
 		li.style.height = board.element.scrollHeight+"px";
 		li.style.width = board.element.scrollWidth+"px";
 		li.classList.add(board.option.theme || this.option.theme);
+		
+		var observer = new MutationObserver(function(mutation){
+			panelChangeReactor.call(this, mutation, board);
+		});
+		var observeoptions = {
+		  'childList': true,
+		  'subtree': true
+		} ;
+		observer.observe(li, observeoptions);
+		
 		return li;
 	};
 	
