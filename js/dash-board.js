@@ -206,7 +206,7 @@ define(function(){
 		}else if(option.content){
 			content.innerHTML=option.content;
 		}
-		content.style.minHeight = (this.option.minHeight-20)+"px";
+		content.style.minHeight = (this.option.minHeight)+"px";
 		return content;
 	}
 	
@@ -225,7 +225,6 @@ define(function(){
 	var boardDefalt ={
 		element: document.createElement("div"),
 		title: '',
-		minHeight: 50,
 		column: undefined,
 		contentUrl:undefined,
 		content: undefined,
@@ -249,8 +248,8 @@ define(function(){
 		var init = function(){
 			var div = document.createElement("div");
 			div.classList.add("boardboard");
-			div.style.minHeight = this.option.minHeight+"px";
-			div.style.width = "100%";
+			//div.style.minHeight = this.option.minHeight+"px";
+			//div.style.width = "100%";
 			var title = createTitle.apply(this);
 			div.appendChild(title);
 			div.appendChild(createContent.call(this, this.option));
@@ -259,11 +258,13 @@ define(function(){
 		this.option.element = init.apply(this);
 	};
 	
-	var boardDefaultOptions = {
+	var mainDefault = {
 		element: document.body,
 		column: 2,
 		onLoad: function(){},
-		theme: 'defaultTheme'
+		theme: 'defaultTheme',
+		minHeight: 50,
+		minWidth: 300
 	};
 	var createUl = function(parent, totalColumn, i){
 		var ul = document.createElement("ul");
@@ -296,7 +297,7 @@ define(function(){
 	var DashBoard = function(options){
 		var dashBoard = this, columns=[];
 		var boards = [];
-		var option = CopyOptions(boardDefaultOptions, options);
+		var option = CopyOptions(mainDefault, options);
 		if(typeof option.element === 'string'){
 			option.element = document.getElementById(option.element) || document.body;
 		}
@@ -314,16 +315,37 @@ define(function(){
 				get: function(){return columns;}
 			},'right':{
 				get: function(){return right;}
+			}, 'init': {
+				get: function(){
+					return function(){
+						columns = [];
+						var maxColumn = columnFit(option);
+						if(maxColumn < option.column){
+							option.column = maxColumn;
+							console.debug("Max Column Number is "+maxColumn);
+						}
+						for(var i=0; i<option.column; i++){
+							columns.push(createUl.call(this, this.option.element, this.option.column, i));
+						}
+						//option.onNewBoard.call(this);
+						var i = findLongestUl(columns);
+						option.element.style.height = columns[i].scrollHeight + "px";
+					};
+				}
 			}
 		});
-		
-		for(var i=0; i<option.column; i++){
-			columns.push(createUl.call(this, this.option.element, this.option.column, i));
-		}
-		//option.onNewBoard.call(this);
-		var i = findLongestUl(columns);
-		option.element.style.height = columns[i].scrollHeight + "px";
-		option.element.style.width =  option.element.scrollWidth + "px";
+		this.init();
+		window.onresize = function(){
+			var maxColumn = columnFit(option);					
+			if(columns.length != maxColumn){
+				dashBoard.refresh();
+			}
+		};
+	};
+
+	var columnFit = function(option){
+		return Math.min(option.column, parseInt(option.element.scrollWidth / (option.minWidth+20)));
+						
 	};
 	
 	var standardLi = function(){
@@ -332,6 +354,7 @@ define(function(){
 		li.onmouseover=mouseOverLi.bind(li);
 		li.classList.add("boardboardLi");
 		li.style.padding = "10px";
+		//li.style.width = "100%";
 		return li;
 	};
 	
@@ -352,17 +375,18 @@ define(function(){
 	
 	var createLi = function(board, columns){
 		var li = standardLi(), ul;
-		if(isNaN(board.column)){
-			board.column = findShortestUl(columns);
+		var col = board.column;
+		if(isNaN(board.column) || board.column>columns.length){
+			col = findShortestUl(columns);
 		}else{
-			board.column>=1 && board.column--;
+			board.column>=1 && (col = board.column-1);
 		}
-		ul = columns[board.column];
+		ul = columns[col];
 		ul.insertBefore(li, ul.lastChild);
 		var offset = findOffset.call(this, li);
 		li.appendChild(board.element);
-		li.style.height = board.element.scrollHeight+"px";
-		li.style.width = board.element.scrollWidth+"px";
+		//li.style.height = board.element.scrollHeight+"px";
+		//li.style.width = board.element.scrollWidth+"px";
 		li.classList.add(board.option.theme || this.option.theme);
 		
 		var observer = new MutationObserver(function(mutation){
@@ -380,13 +404,9 @@ define(function(){
 	DashBoard.prototype={
 		addBoard : function(options){
 			var board = new Board(options);
-			var column = board.column;
-			createLi.call(this, board, this.columns);
-			this.boards.push(board);
-			var i = findLongestUl(this.columns);
-			this.option.element.style.height =  this.columns[i].scrollHeight + "px";
-			
 			board.parent = this;
+			this.boards.push(board);
+			this.appencBoard(board);
 			board.option.onLoad.call(this);
 			return this;
 		},
@@ -401,10 +421,24 @@ define(function(){
 				return this.boards[index];
 			}
 			throw new Error('Index Not Found.','DashBoard');
+		},
+
+		appencBoard: function(board){
+			createLi.call(this, board, this.columns);
+			var i = findLongestUl(this.columns);
+			this.option.element.style.height =  this.columns[i].scrollHeight + "px";
+			board.element.style.minHeight = (board.option.minHeight || this.option.minHeight)+"px";
+			board.element.style.minWidth = (board.option.minWidth || this.option.minWidth)+"px";
+			
+		},
+
+		refresh: function(){
+			while(this.option.element.children[0]){
+				this.option.element.removeChild(this.option.element.children[0]);
+			}
+			this.init();
 		}
 	}
-	
-	
 	
 	return DashBoard;
 });

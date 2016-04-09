@@ -1,2 +1,4 @@
 /.project
 /pom.xml
+node_modules/*
+/server.js
