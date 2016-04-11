@@ -1,19 +1,19 @@
 <div style="padding: 5px;">
 <p>After init, add signal dash board by using function .addBoard(): </p>
 <pre class="code" wrap="virtual">dashboard.addBoard({
-		title:'Init the board',
-		minHeight: 100,
-		content: 'Some HTML'
-	}).addBoard({
-		title:'Init Board Options',
-		minHeight: 300,
-		column: 1,
-	}).addBoard({
-		title:'Add Single Board',
-		minHeight: 120,
-		column: 2,
-		contentUrl: 'src/content/addboard.html'
-	})
+        title:'Init the board',
+        minHeight: 100,
+        content: 'Some HTML',
+        removable: false,
+        edit: {
+         contentUrl: 'src/edit/angularEdit.html',
+        }
+    }).addBoard({
+        title:'Add Single Board',
+        minHeight: 120,
+        column: 2,
+        contentUrl: 'src/content/addboard.html'
+    });
 </code>
 </pre>
 </div>
