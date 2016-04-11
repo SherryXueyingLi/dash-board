@@ -48,4 +48,15 @@ input{
 	padding: 5px;
     border-radius: 3px;
     border: solid 1px #A5A1A1;
+    margin: 10px 0px 10px 0px;
+    
+}
+button{
+	padding: 5px 10px 5px 10px;
+    border-radius: 3px;
+    border: solid 1px #A5A1A1;
+    background-color: white;
+}
+button:hover{
+	background-color: #7FBDE6;
 }
