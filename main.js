@@ -2,12 +2,24 @@ require.config({
 	paths: {
 		'dashBoard': 'js/dash-board',
 		'knockout': 'src/lib/knockout-3.3.0',
-		'vm': 'src/content/knockoutvm'
-	}
+		'vm': 'src/content/knockoutvm',
+		"angular": "src/lib/angular.min",
+	},
+	shim: {
+		'angular': {
+			exports: 'angular'
+		},
+	},
 })
 
-require(['dashBoard', "knockout"], function(DashBoard, ko){
+require(['dashBoard', "knockout", "angular"], function(DashBoard, ko, angular){
 	"use restrict";
+	var app = angular.module("dashboard",[]);
+	
+	app.config(function($controllerProvider){
+		app.cp = $controllerProvider;
+	});
+	angular.bootstrap(document, ['dashboard']);
 	var border = document.getElementById("dashboard");
 	window.dashboard = new DashBoard({
 		element: "dashboard",
@@ -36,11 +48,6 @@ require(['dashBoard', "knockout"], function(DashBoard, ko){
 		contentUrl: 'src/content/addboardOption.html',
 		column: 2
 	}).addBoard({
-		name: 'boardApi',
-		title:'Board APIs',
-		minHeight: 180,
-		column: 2
-	}).addBoard({
 		name: 'koBind',
 		title:'knockout Binding',
 		minHeight: 180,
@@ -58,6 +65,12 @@ require(['dashBoard', "knockout"], function(DashBoard, ko){
 		column: 3,
 		contentUrl: 'src/content/angular.html',
 		onLoad: function(){
+			require(['src/content/angularController'], function(AngularController){
+				angular.element(document).ready(function() {
+					app.cp.register('demoContrl', ['$scope',AngularController]);
+				});
+				
+			});
 		},
 		removable: false,
 		edit: {
@@ -72,5 +85,11 @@ require(['dashBoard', "knockout"], function(DashBoard, ko){
 		title:'Dash Board APIs',
 		column: 1,
 		contentUrl: 'src/content/dashboardApis.html',
+	}).addBoard({
+		name: 'boardApi',
+		title:'Single Board APIs',
+		contentUrl: 'src/content/addboardAPIs.html',
+		minHeight: 180,
+		column: 1
 	});
 });

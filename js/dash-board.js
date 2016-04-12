@@ -103,8 +103,8 @@ define(function(){
 		hideContexMenu();
 		createContextMenu(this);
 		document.body.appendChild(contextMenu);
-		contextMenu.style.top = event.pageY+"px";
-		contextMenu.style.left = (event.pageX-contextMenu.scrollWidth)+"px";
+		contextMenu.style.top = event.clientY+"px";
+		contextMenu.style.left = (event.clientX-contextMenu.scrollWidth)+"px";
 	};
 	
 	var dropzone = createDropZone();
@@ -155,7 +155,7 @@ define(function(){
 			li.style.top =  moveY+"px";
 			
 			var tar = document.elementFromPoint(event.pageX, event.pageY);
-			while(tar.parentElement && tar.tagName!=="LI"){
+			while(tar && tar.parentElement && tar.tagName!=="LI"){
 				tar = tar.parentElement;
 			}
 			if(tar!= dragObj.element.parentElement && tar.tagName === "LI" && tar != currLi && tar!=dropzone){
@@ -277,7 +277,8 @@ define(function(){
 		removable: true,
 		theme: undefined,
 		edit: undefined,
-		onLoad: function(){}
+		onLoad: function(){},
+		beforeLoad: function(){}
 	};
 	
 	var Board = function(options){
