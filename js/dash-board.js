@@ -158,7 +158,7 @@ define(function(){
 			while(tar && tar.parentElement && tar.tagName!=="LI"){
 				tar = tar.parentElement;
 			}
-			if(tar!= dragObj.element.parentElement && tar.tagName === "LI" && tar != currLi && tar!=dropzone){
+			if(tar && tar!= dragObj.element.parentElement && tar.tagName === "LI" && tar != currLi && tar!=dropzone){
 				currLi = tar;
 				tar.parentElement.insertBefore(dropzone, tar);
 			}
