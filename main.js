@@ -10,16 +10,12 @@ require.config({
 			exports: 'angular'
 		},
 	},
-})
+});
 
 require(['dashBoard', "knockout", "angular"], function(DashBoard, ko, angular){
 	"use restrict";
-	var app = angular.module("dashboard",[]);
 	
-	app.config(function($controllerProvider){
-		app.cp = $controllerProvider;
-	});
-	angular.bootstrap(document, ['dashboard']);
+	
 	var border = document.getElementById("dashboard");
 	window.dashboard = new DashBoard({
 		element: "dashboard",
@@ -30,7 +26,7 @@ require(['dashBoard', "knockout", "angular"], function(DashBoard, ko, angular){
 		name: 'init',
 		title:'Init the board',
 		minHeight: 120,
-		content: '<div style="padding: 5px;"><p>To Init the board:</p><code>var dashboard = new DashBoard({options});</code></div>'
+		content: '<div style="padding: 5px;"><p>To Init the board:</p><code><key>var</key> dashboard = <key>new</key> DashBoard({options});</code></div>'
 	}).addBoard({
 		name: 'initOption',
 		title:'Init Board Options',
@@ -66,10 +62,9 @@ require(['dashBoard', "knockout", "angular"], function(DashBoard, ko, angular){
 		contentUrl: 'src/content/angular.html',
 		onLoad: function(){
 			require(['src/content/angularController'], function(AngularController){
-				angular.element(document).ready(function() {
-					app.cp.register('demoContrl', ['$scope',AngularController]);
-				});
-				
+				var app = angular.module("angularBoard",[]);
+				app.controller('demoContrl', AngularController);
+				angular.bootstrap(document, ['angularBoard']);
 			});
 		},
 		removable: false,

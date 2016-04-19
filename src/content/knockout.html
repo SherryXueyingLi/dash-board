@@ -3,18 +3,18 @@
 <p data-bind="text: show" ></p>
 
 <pre  class="code" wrap="virtual">
-var onloadFunc = function(){
-    var div = document.getElementById('ko');
-    require(["knockout", "vm"],function(ko, vm){
+<key>var</key> onloadFunc = <key>function</key>(){
+    <key>var</key> div = document.getElementById(<string>'ko'</string>);
+    require([<string>"knockout"</string>, <string>"vm"</string>],<key>function</key>(ko, vm){
         ko.applyBindings(vm, div);
     });
 }
 
 dashboard.addBoard({
-    title:'knockout Binding',
+    title: <string>'knockout Binding'</string>,
     minHeight: 180,
     column: 3,
-    contentUrl: 'src/content/knockout.html',
+    contentUrl: <string>'src/content/knockout.html'</string>,
     onLoad: onloadFunc
 });
 </pre>

@@ -1,6 +1,6 @@
 define(function(){
 	var controller = function($scope){
-		$scope.angVal="init";
+		$scope.angVal="type here";
 	};
 	
 	return controller;
