@@ -1,11 +1,28 @@
-<div ng-controller="demoContrl" style="padding: 10px" >
+<div ng-controller="demoContrl" style="padding: 10px">
 <input ng-model="angVal"></input>
-<p>{{angVal}} </p> Looks Failed... can anyone help...T T
+<p>{{angVal}} </p>
 <div class="code">
-<pre>var onloadFunc = function(){
-};
-
-dashboard.addBoard();</pre>
+<pre><key>var</key> onAngularLoad = <key>function</key>(){
+    require([<string>'src/content/angularController'</string>], 
+<key>function</key>(AngularController){
+    <key>var</key> app = angular.module(<string>"angularBoard"</string>,[]);
+    app.controller(<string>'demoContrl'</string>, AngularController);
+    angular.bootstrap(document, [<string>'angularBoard'</string>]);
+});
+},
+dashboard.addBoard({
+    name: <string>'angular'</string>,
+    title:<string>'Anduglar Controller Injection'</string>,
+    minHeight: 180,
+    column: 3,
+    contentUrl: <string>'src/content/angular.html'</string>,
+    onLoad: onAngularLoad,
+    removable: false,
+    edit: {
+        contentUrl: <string>'src/edit/angularEdit.html'</string>,
+        onLoad: function(){}
+    }
+});</pre>
 </div>
 
 <p></p>

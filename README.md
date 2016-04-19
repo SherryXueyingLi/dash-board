@@ -8,6 +8,7 @@ See the [demo](http://sherryxueyingli.github.io/dash-board/) page.
 
 Use with requireJs: 
 
+```javascript
 	require.config({
 		paths: {
 			'dashBoard': 'js/dash-board'
@@ -19,6 +20,7 @@ Use with requireJs:
 				column: 3,
 			});
 	});
+```
 			
 **Options**
 
@@ -29,6 +31,8 @@ Use with requireJs:
 
 
 ## Add Dash Board
+
+```javascript
 	dashboard.addBoard({
 			title:'Init the board',
 			minHeight: 100,
@@ -43,6 +47,7 @@ Use with requireJs:
 			column: 2,
 			contentUrl: 'src/content/addboard.html'
 		});
+```
 		
 **Options**
 
