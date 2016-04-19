@@ -17,6 +17,11 @@ require(['dashBoard', "knockout", "angular"], function(DashBoard, ko, angular){
 	
 	
 	var border = document.getElementById("dashboard");
+	var app = angular.module("angularBoard",[]);
+	app.config(function($controllerProvider, $compileProvider){
+		app.controllerProvider = $controllerProvider;
+		app.compileProvider = $compileProvider;
+	});
 	window.dashboard = new DashBoard({
 		element: "dashboard",
 		column: 3,
@@ -61,16 +66,18 @@ require(['dashBoard', "knockout", "angular"], function(DashBoard, ko, angular){
 		column: 3,
 		contentUrl: 'src/content/angular.html',
 		onLoad: function(){
-			require(['src/content/angularController'], function(AngularController){
-				var app = angular.module("angularBoard",[]);
+			var board = this;
+			require(['src/content/angularController'], 
+				function(AngularController){
 				app.controller('demoContrl', AngularController);
-				angular.bootstrap(document, ['angularBoard']);
+				angular.bootstrap(board.element, ['angularBoard']);
 			});
 		},
 		removable: false,
 		edit: {
 			contentUrl: 'src/edit/angularEdit.html',
 			onLoad: function(){
+				
 			}
 		}
 	});
