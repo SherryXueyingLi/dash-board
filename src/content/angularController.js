@@ -1,5 +1,5 @@
 define(function(){
-	var controller = function($scope){
+	var controller = function($scope, $compile){
 		$scope.angVal="type here";
 	};
 	

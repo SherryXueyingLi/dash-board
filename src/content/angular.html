@@ -1,13 +1,15 @@
-<div ng-controller="demoContrl" style="padding: 10px">
+<div  style="padding: 10px">
+<div ng-controller="demoContrl">
 <input ng-model="angVal"></input>
 <p>{{angVal}} </p>
 <div class="code">
 <pre><key>var</key> onAngularLoad = <key>function</key>(){
     require([<string>'src/content/angularController'</string>], 
-<key>function</key>(AngularController){
-    <key>var</key> app = angular.module(<string>"angularBoard"</string>,[]);
-    app.controller(<string>'demoContrl'</string>, AngularController);
-    angular.bootstrap(document, [<string>'angularBoard'</string>]);
+<key>function</key>(Controller){
+    <key>var</key> board = <key>this</key>;
+    <key>var</key> app = angular.module(<string>"angInj"</string>,[]);
+    app.controller(<string>'demoContrl'</string>, Controller);
+    angular.bootstrap(board.element, [<string>'angInj'</string>]);
 });
 },
 dashboard.addBoard({
@@ -24,6 +26,5 @@ dashboard.addBoard({
     }
 });</pre>
 </div>
-
-<p></p>
+</div>
 </div>

@@ -73,11 +73,14 @@ define(function(){
 	};
 	
 	var onBoardEdit = function(event){
-		var element = this.element;
+		var element = this.option.element;
 		var board = this;
-		var content = element.getElementsByClassName("boardContent")[0];
+		element.getElementsByClassName("boardContent")[0].style.display="none";
+		if(element.getElementsByClassName("editBoard")[0]){
+			element.getElementsByClassName("editBoard")[0].style.display=null;
+			return;
+		}
 		if(this.option.edit.contentUrl){
-			content.style.display="none";
 			var editContent = document.createElement("div");
 			editContent.classList.add("editBoard");
 			var request = new XMLHttpRequest();
@@ -296,7 +299,9 @@ define(function(){
 		};
 		Object.defineProperties(this, {
 			'option':{
-				get: function(){return option;}
+				get: function(){
+					return option;
+				}
 			},'element':{
 				get: function(){return this.option.element;}
 			}, 'column':{
@@ -318,6 +323,21 @@ define(function(){
 							this.option.element.style.minHeight = (this.option.minHeight || this.parent.option.minHeight)+"px";
 							this.option.element.style.minWidth = (this.option.minWidth || this.parent.option.minWidth)+"px";
 						}
+						
+					}
+				}
+			}, 'back':{
+				get: function(){
+					return function(){
+						for(var i=0; i< this.option.element.childElementCount; i++){
+							if(this.option.element.children[i].classList.contains("boardTitle") ||
+								this.option.element.children[i].classList.contains("boardContent")){
+								this.option.element.children[i].style.display = null;
+							}else{
+								this.option.element.children[i].style.display = "none";
+							}
+						}
+						
 					}
 				}
 			}
@@ -499,7 +519,7 @@ define(function(){
 			this.option.element.style.height =  this.columns[i].scrollHeight + "px";
 			board.element.style.minHeight = (board.option.minHeight || this.option.minHeight)+"px";
 			board.element.style.minWidth = (board.option.minWidth || this.option.minWidth)+"px";
-			board.option.onLoad.call(this);
+			board.option.onLoad.call(board);
 		},
 		
 		removeBoard: function(board){
